@@ -218,7 +218,7 @@ void accountLogin(void) {
     puts("Connection error!");
     exit(1);
   }
-  fscanf(file, "%d", login.accountBalance);
+  fscanf(file, "%d", &login.accountBalance);
   fclose(file);
   stringCleaner(fileName);
   if( (file = fopen("dataBase/creditEqAcc.atm", "r")) == NULL ) {
@@ -248,5 +248,16 @@ void accountLogin(void) {
 }
 
 void loginPage(Login userLogin) {
-  
+  printf("Hesap Numarasi\tHesap Bakiyesi\t");
+  if(userLogin.creditCardNumber != 0 ) {
+    printf("Kredi Kart Numarasi\tKredi Borcu\tKredi Limit");
+  }
+  printf("\n--------------\t--------------\t");
+  if(userLogin.creditCardNumber != 0 ) {
+    printf("-------------------\t-----------\t-----------");
+  }
+  printf("\n%d %9d", userLogin.accountNumber, userLogin.accountBalance);
+  if( userLogin.creditCardNumber != 0 ) {
+    printf("%21d %18d %18d", userLogin.creditCardNumber, userLogin.creditBalance, userLogin.creditLimit);
+  }
 }
