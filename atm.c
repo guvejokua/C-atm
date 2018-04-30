@@ -24,9 +24,9 @@ void newAccount(void) {
   fclose(file);
   while(1) {  //Paralo kontrolü
     printf("Lutfen 4 haneli bir parola giriniz: ");
-    scanf("%d", &newUser.password);
+    scanf_s("%d", &newUser.password);
     printf("Lutfen tekrar giriniz: ");
-    scanf("%d", &newUser.rePassword);
+    scanf_s("%d", &newUser.rePassword);
     if( newUser.password < 1000 || newUser.password > 9999 ) {
       printf("Sifreniz 4 haneli degil lutfen tekrar deneyin\n");
       if( !( newUser.password == newUser.rePassword ) ) {
@@ -40,7 +40,7 @@ void newAccount(void) {
   }
   while(1) {  //TC Kn kontrolü
     printf("TC Numaranizi giriniz:");
-    scanf("%s", &newUser.tcKN);
+    scanf_s("%s", &newUser.tcKN);
     if( (newUser.tcKN[10] == '\0') || newUser.tcKN[11] != '\0' || newUser.tcKN[9]  == '\0' ) {
       printf("TC numaraniz hatali lutfen tekrar deneyin ve iptal icin CTRL+C\n");
     }
@@ -48,9 +48,9 @@ void newAccount(void) {
   }
   //Diğer bilgiler isteniyor---------------------------------------------------
     printf("Adinizi giriniz:      ");
-    scanf("%s", &newUser.name);
+    scanf_s("%s", &newUser.name);
     printf("Soyadinizi giriniz:   ");
-    scanf("%s", &newUser.surname);
+    scanf_s("%s", &newUser.surname);
   //Kayıt Bloğu----------------------------------------------------------------
 
   //Son hesap numarası bir artırılıyor-------------------------------------------
@@ -95,8 +95,8 @@ void newAccount(void) {
     printf("Yeni Hesabiniz olusturuldu.. ");
 
   //İsteğe bağlı kredi kartı ekleme----------------------------------------------
-    printf("\nHesabiniza kredi karti eklemek istedmisiniz(1/0)");
-    scanf("%d", &status);
+    printf("\nHesabiniza kredi karti eklemek istermisiniz(1/0)");
+    scanf_s("%d", &status);
     if( status == 1 ) {
       creditCardNo = newCreditCard(newUser.accountNumber);
       file = fopen("dataBase/creditEqAcc.atm", "a+");
@@ -130,7 +130,7 @@ int newCreditCard(int accountNumber) {
 
     while(1) {  //Limit belirleme ve kontrolü
       printf("\nKredi kartiniz icin bir limit belirleyiniz: ");
-      scanf("%d", &limit);
+      scanf_s("%d", &limit);
       if( (limit > balance + 1000) || limit < 0 ) {
         printf("Giridiginiz limit hesap bakiyenize izin verilmiyor..\nLutfen hesap numaranizin max. 1000Tl fazlasini giriniz:");
       }
@@ -179,9 +179,9 @@ void accountLogin(void) {
   printf("Hesabiniza giris yapmak icin\n");
   while(1) {
     printf("Hesap Numaranizi Giriniz: ");
-    scanf("%d", &login.accountNumber);
+    scanf_s("%d", &login.accountNumber);
     printf("Sifrenizi giriniz: ");
-    scanf("%d", &login.reg_password);
+    scanf_s("%d", &login.reg_password);
     stringCleaner(fileName);
     sprintf(fileName, "database/%d.psw", login.accountNumber);
     file = fopen(fileName, "r");
@@ -260,4 +260,100 @@ void loginPage(Login userLogin) {
   if( userLogin.creditCardNumber != 0 ) {
     printf("%21d %18d %18d", userLogin.creditCardNumber, userLogin.creditBalance, userLogin.creditLimit);
   }
+  operation(userLogin);
+}
+
+void operation(Login userInfo) {
+  int selection;
+  printf("\n---------------------------------------------------------------------------------------");
+  printf("\nIslemler: \n");
+  puts("1-Para Cek");
+  puts("2-Para Yatır");
+  puts("3-Havale");
+  puts("4-Sifre Degistir");
+  if( userInfo.creditCardNumber != 0 ) {
+    puts("Kredi Kart Islemleri");
+    puts("5-Borc Odeme");
+    puts("6-Limit Artirma");
+  }
+  printf("Secimiziniz :");
+  scanf_s("%d", &selection);
+  switch (selection) {
+    case 1: {
+      wdMoney(userInfo.accountNumber, userInfo.accountBalance);
+      break;
+    }
+    case 2: {
+      dpstMoney(userInfo.accountNumber, userInfo.accountBalance);
+      break;
+    }
+    case 3: {
+      transfer(userInfo.accountNumber, userInfo.accountBalance);
+      break;
+    }
+    case 4: {
+      changePsw(userInfo.accountNumber);
+    }
+    case 5: {
+      if( userInfo.creditCardNumber != 0 ) {
+        payment(userInfo.accountNumber, userInfo.creditCardNumber, userInfo.creditBalance, userInfo.accountBalance);
+      }
+      else ;
+      break;
+    }
+    case 6: {
+      if( userInfo.creditCardNumber != 0 ) {
+        limit(userInfo.accountBalance, userInfo.creditCardNumber, userInfo.creditBalance);
+      }
+    }
+  }
+}
+
+void wdMoney(int accountNumber, int accountBalance) {
+  FILE *file;
+  char fileName[50];
+  int money, verify;
+  while( money != 0 ) {
+    printf("Cekebileceginiz max tutar : %d\n", accountBalance);
+    printf("Cekmek istediginiz tutari giriniz : ");
+    scanf_s("%d", &money);
+    if( money <= accountBalance && money != 0 ) {
+      printf("%d hesabinizdan, %d TL para cekeceksiniz. Onayliyor musunuz (1/0)", accountNumber, accountBalance);
+      if( verify == 1 ) {
+        puts("Isleminiz gerceklestiriliyor.");
+        sprintf(fileName, "dataBase/%d.account", accountNumber);
+        if( (file = fopen(fileName, "w")) == NULL ) {
+          puts("Connection error");
+          exit(1);
+        }
+        fprintf(file, "%d", (accountBalance-money));
+        puts("Isleminiz gerceklesitirildi");
+        break;
+      }
+    }
+    else {
+      puts("Lutfen gecerli bir tutar giriniz!! veya islemi iptal icin 0'a basiniz");
+    }
+  }
+  puts("Isleminiz iptal edildi...");
+}
+
+void dpstMoney(int accountNumber, int accountBalance) {
+
+}
+
+void transfer(int accountNumber, int accountBalance) {
+
+}
+
+void changePsw(int accountNumber) {
+
+}
+
+void payment(int accountNumber, int creditCardNumber, int creditBalance, int accountBalance) {
+
+}
+
+void limit(int accountBalance, int creditCardNumber, int creditBalance) {
+
 }

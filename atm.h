@@ -15,5 +15,12 @@ void newAccount(void);
 int newCreditCard(int accountNumber);
 void stringCleaner(char string[]);
 void accountLogin(void);
-void loginPage(struct loginUser userLogin);
+void loginPage(Login userLogin);
+void operation(Login userInfo);
+void wdMoney(int accountNumber, int accountBalance);
+void dpstMoney(int accountNumber, int accountBalance);
+void transfer(int accountNumber, int accountBalance);
+void changePsw(int accountNumber);
+void payment(int accountNumber, int creditCardNumber, int creditBalance, int accountBalance);
+void limit(int accountBalance, int creditCardNumber, int creditBalance);
 #endif
