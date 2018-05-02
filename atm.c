@@ -170,12 +170,18 @@ int newCreditCard(int accountNumber) {
 
   //newCreditCard sonu
 }
+
+//Hesaba giriş için kullanılacak fonksiyon accountLogin başlangıçı---------------
+
 void accountLogin(void) {
   FILE *file;
   Login login;
   int readedAccNum, readedCreditNum;
   char fileName[50];
-  login.creditCardNumber = 0;
+  login.creditCardNumber = 0;           //Varsayılan kredi kart numarası 0 ------
+
+  //Kullanıcıdan verileri isteniyor----------------------------------------------
+
   printf("Hesabiniza giris yapmak icin\n");
   while(1) {
     printf("Hesap Numaranizi Giriniz: ");
@@ -185,8 +191,11 @@ void accountLogin(void) {
     stringCleaner(fileName);
     sprintf(fileName, "database/%d.psw", login.accountNumber);
     file = fopen(fileName, "r");
+
+    //Veriler veritabanındakiler ile eşleştiriliyor-------------------------------
+
     if( file == NULL ) {
-      printf("Ilgili Veritabanına erisilemiyor. Hesap numaranizi kontrol ediniz\n\a");
+      printf("Ilgili Veritabanina erisilemiyor. Hesap numaranizi kontrol ediniz\n\a");
       stringCleaner(fileName);
     }
     else {
@@ -196,9 +205,14 @@ void accountLogin(void) {
         fclose(file);
         break;
       }
-      else ;
+      else if( login.reg_password != login.password ) {
+        puts("Sifrenizi yanlis girdiniz. Lutfen tekrar deneyin");
+      }
     }
   }
+
+//Şifre ve hesap numarası eşleşirse diğer veriler çekiliyor------------------------
+
   puts("-----------------------------------------------------------------");
   stringCleaner(fileName);
   sprintf(fileName, "dataBase/%d.info", login.accountNumber);
@@ -212,6 +226,9 @@ void accountLogin(void) {
   fscanf(file, "%s", login.surname);
   fclose(file);
   stringCleaner(fileName);
+
+//Giriş yapıldığına dair Mehraba $isim $soyisim yazdırılıyor------------------------
+
   printf("Merhaba %s %s\n\n", login.name, login.surname);
   sprintf(fileName, "dataBase/%d.account", login.accountNumber);
   if( (file = fopen(fileName, "r")) == NULL ) {
@@ -221,6 +238,9 @@ void accountLogin(void) {
   fscanf(file, "%d", &login.accountBalance);
   fclose(file);
   stringCleaner(fileName);
+
+//Hesap numarasına ait kredi kartı bilgisi kontrol ediliyor-------------------------
+
   if( (file = fopen("dataBase/creditEqAcc.atm", "r")) == NULL ) {
     puts("Connection error");
     exit(1);
@@ -233,6 +253,9 @@ void accountLogin(void) {
     }
   }
   fclose(file);
+
+//Eğer kredi kartı varsa, kredi kartına ait bilgiler çekiliyor------------------------
+
   if( login.creditCardNumber == 0 ) ;
   else {
     stringCleaner(fileName);
@@ -244,8 +267,13 @@ void accountLogin(void) {
     fscanf(file, "%d", &login.creditBalance);
     fscanf(file, "%d", &login.creditLimit);
   }
+
+//Alınan veriler giriş ekranını yazdırmak için loginPage fonksiyonuna gönderiliyor---
+
   loginPage(login);
 }
+
+//loginPage fonksiyonu sonu-----------------------------------------------------------
 
 void loginPage(Login userLogin) {
   printf("Hesap Numarasi\tHesap Bakiyesi\t");
@@ -312,13 +340,14 @@ void operation(Login userInfo) {
 void wdMoney(int accountNumber, int accountBalance) {
   FILE *file;
   char fileName[50];
-  int money, verify;
+  int money = 20, verify = 0;
   while( money != 0 ) {
     printf("Cekebileceginiz max tutar : %d\n", accountBalance);
     printf("Cekmek istediginiz tutari giriniz : ");
-    scanf_s("%d", &money);
+    scanf_s("%d", money);
     if( money <= accountBalance && money != 0 ) {
       printf("%d hesabinizdan, %d TL para cekeceksiniz. Onayliyor musunuz (1/0)", accountNumber, accountBalance);
+      scanf_s("%d", &verify);
       if( verify == 1 ) {
         puts("Isleminiz gerceklestiriliyor.");
         sprintf(fileName, "dataBase/%d.account", accountNumber);
@@ -331,11 +360,15 @@ void wdMoney(int accountNumber, int accountBalance) {
         break;
       }
     }
+    else if( money == 0 ) {
+      puts("Isleminiz iptal edildi...");
+      break;
+    }
     else {
       puts("Lutfen gecerli bir tutar giriniz!! veya islemi iptal icin 0'a basiniz");
     }
+
   }
-  puts("Isleminiz iptal edildi...");
 }
 
 void dpstMoney(int accountNumber, int accountBalance) {
