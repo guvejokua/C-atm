@@ -51,7 +51,7 @@ void newAccount(void) {
     scanf_s("%s", &newUser.name);
     printf("Soyadinizi giriniz:   ");
     scanf_s("%s", &newUser.surname);
-  //Kayıt Bloğu----------------------------------------------------------------
+  //Kayıt Bloğu------------------------------------------------------------------
 
   //Son hesap numarası bir artırılıyor-------------------------------------------
     file = fopen("dataBase/lastAccountNumber.atm", "w");
@@ -344,7 +344,7 @@ void wdMoney(int accountNumber, int accountBalance) {
   while( money != 0 ) {
     printf("Cekebileceginiz max tutar : %d\n", accountBalance);
     printf("Cekmek istediginiz tutari giriniz : ");
-    scanf_s("%d", money);
+    scanf_s("%d", &money);
     if( money <= accountBalance && money != 0 ) {
       printf("%d hesabinizdan, %d TL para cekeceksiniz. Onayliyor musunuz (1/0)", accountNumber, accountBalance);
       scanf_s("%d", &verify);
