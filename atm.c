@@ -372,7 +372,30 @@ void wdMoney(int accountNumber, int accountBalance) {
 }
 
 void dpstMoney(int accountNumber, int accountBalance) {
-
+  FILE *file;
+  char fileName[50];
+  int dsptBalance, verify;
+  puts("Lutfen yatirmak istediginiz miktari giriniz:");
+  while( dsptBalance <= 0 ) {
+    scanf_s("%d", &dsptBalance);
+    if( dsptBalance <= 0 ) {
+      puts("Lutfen gecerli bir miktar giriniz.");
+    }
+  }
+  printf("New account balance = %d\n", (accountBalance + dsptBalance));
+  printf("Confirm(1/0): ");
+  scanf_s("%d", &verify);
+  if(verify == 1) {
+    puts("Isleminiz gerceklestiriliyor");
+    sprintf(fileName, "dataBase/%d  .account", accountNumber);
+    if( (file = fopen(fileName, "w")) == NULL ) {
+      puts("Database error. Please try again!!");
+      exit(1);
+    }
+    fprintf(file, "%d", (accountBalance + dsptBalance));
+    fclose(file);
+    puts("Isleminiz gerceklestirildi..");
+  }
 }
 
 void transfer(int accountNumber, int accountBalance) {
